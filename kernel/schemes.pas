@@ -207,7 +207,7 @@ begin SchEqFrm:=false;
      if gFPredSubst.HasInDom(Ord(fFrm2^.FrmSort),PredNr) then
       begin
        lValue:=gFPredSubst.Value(Ord(fFrm2^.FrmSort),PredNr);
-       if lNeg and (lValue < 0) then lValue:=-lValue;
+       if lNeg then lValue:=-lValue;
        if lValue = PredFrmPtr(fFrm2)^.PredNr then
         if SchEqTrmList(PredArgs,PredFrmPtr(fFrm2)^.PredArgs) then
          SchEqFrm:=true
