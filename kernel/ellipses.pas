@@ -672,7 +672,7 @@ end;
 
 function ExpandFlex(fFrm:FrmPtr):FrmPtr;
 var lConjFrmPtr,lScope:FrmPtr;
-var z,lower:integer;
+var z,lower,i:integer;
 var FuncNr:integer; A1:TrmList;
 begin
  MizAssert(2500, FFrm^.FrmSort = ikFrmFlexConj);
@@ -695,8 +695,10 @@ begin
      for z:=0 to VarTrmPtr(nRightTrm)^.VarNr - lower do
       begin
        gCurrentFlexConjunctNr := lower + z;
-       lScope:=
-        FrmPtr(ConjFrmPtr(NegFrmPtr(UnivFrmPtr(nExpansion)^.Scope)^.NegArg)^.Conjuncts.Items^[2]).CopyFormula;
+       lScope:=NewVerum;
+       with ConjFrmPtr(NegFrmPtr(UnivFrmPtr(nExpansion)^.Scope)^.NegArg)^.Conjuncts do
+        for i:=2 to Count-1 do
+         lScope:=NewConj(lScope,FrmPtr(Items^[i]).CopyFormula);
        WithinFormula(lScope,ReplacePlaceHolderByConjunctNumber);
        lConjFrmPtr:=NewConj(lConjFrmPtr,NewNeg(lScope));
       end;
