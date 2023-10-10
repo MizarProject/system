@@ -666,7 +666,7 @@ begin
        TrmSort:=ikTrmNumeral;
        VarNr:=gCurrentFlexConjunctNr;
       end else
-       fTrm:=gZeroFunctor;
+       fTrm:=CopyTerm(gZeroFunctor);
     end else Dec(VarNr);
 end;
 
