@@ -2633,7 +2633,10 @@ begin
  begin
   while (l < Count) and (Items^[l].X < aFunc.Items^[k].X) do inc(l);
   if (l < Count) and (Items^[l].X = aFunc.Items^[k].X) then
-   inc(Items^[l].Y,aFunc.Items^[k].Y)
+   begin
+    if Items^[l].Y > (High(Integer)-aFunc.Items^[k].Y) then RunError(215);
+    inc(Items^[l].Y,aFunc.Items^[k].Y);
+   end
   else AtInsert(l,aFunc.Items^[k]);
  end;
 end;
