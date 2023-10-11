@@ -3743,9 +3743,10 @@ begin EqFrm:=false;
      EqFrm:=EqFrm(UnivFrmPtr(fFrm1)^.Scope,UnivFrmPtr(fFrm2)^.Scope);
    ikFrmFlexConj:
     begin
-     if EqFrm(FlexFrmPtr(fFrm1)^.nLeftOrigFrm,FlexFrmPtr(fFrm2)^.nLeftOrigFrm) then
-        EqFrm:=EqFrm(FlexFrmPtr(fFrm1)^.nRightOrigFrm,FlexFrmPtr(fFrm2)^.nRightOrigFrm);
-     //     EqFrm:=EqFrm(FlexFrmPtr(fFrm1)^.nExpansion,FlexFrmPtr(fFrm2)^.nExpansion);
+     EqFrm:=
+      EqFrm(FlexFrmPtr(fFrm1)^.nLeftOrigFrm,FlexFrmPtr(fFrm2)^.nLeftOrigFrm) and
+      EqFrm(FlexFrmPtr(fFrm1)^.nRightOrigFrm,FlexFrmPtr(fFrm2)^.nRightOrigFrm) and
+      EqFrm(FlexFrmPtr(fFrm1)^.nExpansion,FlexFrmPtr(fFrm2)^.nExpansion);
     end;
    ikError: EqFrm:=true;
    else RunTimeError(2049);
@@ -3936,7 +3937,8 @@ begin StrictEqFrm:=false;
    ikFrmFlexConj:
     StrictEqFrm:=
      StrictEqFrm(FlexFrmPtr(fFrm1)^.nLeftOrigFrm,FlexFrmPtr(fFrm2)^.nLeftOrigFrm) and
-     StrictEqFrm(FlexFrmPtr(fFrm1)^.nRightOrigFrm,FlexFrmPtr(fFrm2)^.nRightOrigFrm);
+     StrictEqFrm(FlexFrmPtr(fFrm1)^.nRightOrigFrm,FlexFrmPtr(fFrm2)^.nRightOrigFrm) and
+     StrictEqFrm(FlexFrmPtr(fFrm1)^.nExpansion,FlexFrmPtr(fFrm2)^.nExpansion);
    ikError: StrictEqFrm:=true;
    else RunTimeError(2049);
   end;
