@@ -8,8 +8,6 @@ unit limits;
 interface
 
 const
-  MaxConstInt = 32767; {maximal signed 16-bit integer}
-
   MaxImpConstrNbr = 400;
   MaxImpNbr = 300;
 
@@ -75,7 +73,7 @@ const
   MaxFuncPattNbr  =  1000;
 
 
-  MaxFuncNbr      =  1500;
+  MaxFuncNbr      =  15000;
      { Maksymalna ilosc funkcji publicznych w artykule, lacznie z pobranymi
        z biblioteki.
        Przekroczenie powoduje przerwanie przetwarzania.
@@ -199,7 +197,7 @@ const
        Uzywana przez PARSER
      }
 
-  MaxTheoNbr      =  2000;
+  MaxTheoNbr      =  20000;
      { Maksymalna ilosc twierdzen na jednym pliku. Powinna byc mniejsza
        od maksymalnej mocy zbioru.
        Przekroczenie powoduje odrzucenie uzasadnienia.
