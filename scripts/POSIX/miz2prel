@@ -1,0 +1,52 @@
+#!/bin/sh
+#
+#          Mizar local data base creation, example shell command
+#
+
+accommodate()
+{
+ accom $1
+ if test "$?" = "0"
+  then
+   exporting $1
+  else
+   errflag $1
+   addfmsg $1 $MIZFILES/mizar
+   exit 2
+ fi
+}
+
+exporting()
+{
+ exporter $1
+ if test "$?" = "0"
+  then
+   make_prel $1
+  else
+   errflag $1
+   addfmsg $1 $MIZFILES/mizar
+   exit 3
+ fi
+}
+
+make_prel()
+{
+ transfer $1
+ for ext in dno dcl dco def the sch
+ do
+  if test -f "$1.$ext"
+   then
+    rm "$1.$ext" 
+  fi
+ done
+ echo "Local data base created"
+}
+
+if test -z "$1"
+ then
+  echo "> `basename $0` error : Missing parameter" 
+  echo "Usage: `basename $0` mizar_article_name" 
+  exit 1
+ else 
+  accommodate "`dirname $1`/`basename $1 .miz`"
+fi

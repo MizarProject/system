@@ -1,5 +1,9 @@
 # Makefile for Mizar 
 
+# Target for installation
+DESTDIR=/usr/local/bin
+SYS=POSIX
+
 # Directory for sources
 MIZSRC=.
 
@@ -67,4 +71,6 @@ $(addprefix $(FPCBIN)/,$(filter-out $(SPECIAL_LIB),$(LIB_EXE))):
 $(addprefix $(FPCBIN)/,$(USR_EXE)): 
 	$(FPC) $(FPCFLAGS) $(MIZSRC)/usrtools/$(basename $(@F)).dpr
 
-
+install:
+	cp bin/* $(DESTDIR)/
+	cp scripts/$(SYS)/* $(DESTDIR)/
