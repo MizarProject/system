@@ -1,0 +1,42 @@
+#!/bin/sh
+#
+#          Mizar Verifier, example shell command
+#
+
+accommodate()
+{
+ makeenv $1
+ if [ "$?" = "0" ]
+  then
+   verify $1
+  else
+   errflag $1
+   addfmsg $1 $MIZFILES/mizar
+   exit 2
+ fi
+}
+
+verify()
+{
+ verifier $1
+ errflag $1
+ addfmsg $1 $MIZFILES/mizar
+}
+
+if [ -z "$1" ]
+ then 
+  echo "> `basename $0` error : Missing parameter" 
+  echo "Usage: `basename $0` mizar_article_name" 
+  if [ -n "$MIZFILES" ]
+   then 
+    MizarReleaseNbr=`awk -F= '/MizarReleaseNbr/{print $2}' $MIZFILES/mml.ini`
+    MizarVersionNbr=`awk -F= '/MizarVersionNbr/{print $2}' $MIZFILES/mml.ini`
+    MizarVariantNbr=`awk -F= '/MizarVariantNbr/{print $2}' $MIZFILES/mml.ini`
+    MMLVersion=`awk -F= '/MMLVersion/{print $2}' $MIZFILES/mml.ini`
+    NumberOfArticles=`awk -F= '/NumberOfArticles/{print $2}' $MIZFILES/mml.ini`
+    echo "MML ver. $MMLVersion.$NumberOfArticles for Mizar ver. $MizarReleaseNbr.$MizarVersionNbr.$MizarVariantNbr available in $MIZFILES"
+  fi
+  exit 1
+ else 
+  accommodate "`dirname $1`/`basename $1 .miz`"
+fi
