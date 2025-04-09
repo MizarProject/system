@@ -393,7 +393,7 @@ begin
        end;
      0:
        begin
-        lVal:=ComplexDiff(MonomialPtr(aPolynomial1^.Items^[i])^.nCoefficient,
+        lVal:=ComplexSub(MonomialPtr(aPolynomial1^.Items^[i])^.nCoefficient,
                     MonomialPtr(aPolynomial2^.Items^[j])^.nCoefficient);
         if not IsEqWithInt(lVal,0) then
          begin
