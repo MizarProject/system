@@ -50,9 +50,9 @@ type
                  rqRealInv,             //23
                  rqRealDiff,            //24
                  rqRealDiv,             //25
-                  {--- XREAL_0             ---}
-                 rqReal,                //26
                   {--- XREAL_0/REAL        ---}
+                 rqReal,                //26
+                  {--- XXREAL_0/REAL       ---}
                  rqPositive,            //27
                  rqNegative,            //28
                   {--- ORDINAL1/NUMERALS   ---}
@@ -60,10 +60,18 @@ type
                   {--- XCMPLX_0/COMPLEX    ---}
                  rqImaginaryUnit,       //30
                  rqComplex,             //31
-                   {--- ORDINAL1/NUMERALS   ---}
+                   {--- ORDINAL1/NUMERALS  ---}
                  rqOmega,               //32
                  rqZeroNumber,          //33
-                 rqZero                 //34
+                 rqZero,                //34
+                   {--- INT_1/INT_D        ---}
+                 rqDiv,			//35
+                 rqMod,			//36
+                 rqDivides,		//37
+                   {--- INT_2/INT_D        ---}
+                 rqLCM,			//38
+                 rqGCD,			//39
+                 rqPrime		//40
               );
 
 const ReqName: array[Requirement] of string = (
@@ -105,9 +113,9 @@ const ReqName: array[Requirement] of string = (
  'rqRealInv',             //23
  'rqRealDiff',            //24
  'rqRealDiv',             //25
- {--- XREAL_0             ---}
- 'rqReal',                //26
  {--- XREAL_0/REAL        ---}
+ 'rqReal',                //26
+ {--- XXREAL_0/REAL       ---}
  'rqPositive',            //27
  'rqNegative',            //28
  {--- ORDINAL1/NUMERALS   ---}
@@ -118,7 +126,15 @@ const ReqName: array[Requirement] of string = (
  {--- ORDINAL1/NUMERALS   ---}
  'rqOmega',               //32
  'rqZeroNumber',          //33
- 'rqZero'                 //34
+ 'rqZero',                //34
+ {--- INT_1/INT_D         ---}
+ 'rqDiv',                 //35
+ 'rqMod',                 //36
+ 'rqDivides',             //37
+ {--- INT_2/INT_D         ---}
+ 'rqLCM',                 //38
+ 'rqGCD',                 //39
+ 'rqPrime'                //40
                                               );
 
 const
@@ -139,7 +155,12 @@ const
                  rqRealDiv,
                  rqImaginaryUnit,
                  rqOmega,
-                 rqZeroNumber];
+                 rqZeroNumber,
+                 rqDiv,
+                 rqMod,
+                 rqLCM,
+                 rqGCD
+                 ];
 
  { Homonymic and special symbols in buildin vocabulery HIDDEN}
  StrictSym = 1;  {"strict"}
@@ -151,7 +172,7 @@ const
 
 var
  gBuiltIn: array[Requirement] of integer =
-     (0,1,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
+     (0,1,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
  gRevReq: array[0..MaxFuncNbr] of Requirement;
 
 procedure InitReverseRequirements;
