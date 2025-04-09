@@ -582,7 +582,7 @@ function CollectInferConst(fTrm:TrmPtr):TrmPtr;
             rqRealMult:
              lConstDef^.fNumericValue:=ComplexMult(lVal1^.fNumericValue,lVal2^.fNumericValue);
             rqRealDiff:
-             lConstDef^.fNumericValue:=ComplexDiff(lVal1^.fNumericValue,lVal2^.fNumericValue);
+             lConstDef^.fNumericValue:=ComplexSub(lVal1^.fNumericValue,lVal2^.fNumericValue);
             rqRealDiv:
              if not IsEqWithInt(lVal2^.fNumericValue,0) then
               lConstDef^.fNumericValue:=ComplexDiv(lVal1^.fNumericValue,lVal2^.fNumericValue)
