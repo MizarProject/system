@@ -18,10 +18,14 @@ interface
 function Add(a,b: string): string;
 function Sub(a,b: string): string;
 function Mul(a,b: string): string;
-function Diva(a,b: string): string;
+function Diva(a,b: string): string; // *Note: divides absolute values and preserves the sign of the division
+function _Div(a,b: string): string;
 function _Mod(a,b: string): string;
 function GCD(a,b: string): string; // *Note: always returns a positive value
-function Abs(a :string ):string;
+function LCM(a,b: string): string; // *Note: always returns a positive value
+function Abs(a :string ): string;
+function IsPrime(a: string): boolean;
+function Divides(a,b: string): boolean;
 
 type
    Rational = record Num,Den : string end;
@@ -35,9 +39,9 @@ const
    CMinusOne: RComplex = (Re:(Num:'-1'; Den:'1'); Im:(Num:'0'; Den:'1'));
    CImUnit: RComplex   = (Re:(Num:'0'; Den:'1'); Im:(Num:'1'; Den:'1'));
 
-procedure RationalGCD(var r: Rational);
+procedure RationalReduce(var r: Rational);
 function RationalAdd(const r1,r2: Rational): Rational;
-function RationalDiff(const r1,r2: Rational): Rational;
+function RationalSub(const r1,r2: Rational): Rational;
 function RationalNeg(const r1: Rational): Rational;
 function RationalMult(const r1,r2: Rational): Rational;
 function RationalInv(const r: Rational): Rational;
@@ -46,7 +50,10 @@ function RationalEq(const r1,r2: Rational): boolean;
 function RationalLE(const r1,r2: Rational): boolean;
 function RationalGT(const r1,r2: Rational): boolean;
 
+function IsIntegerNumber(const z: RComplex): boolean;
 function IsNaturalNumber(const z: RComplex): boolean;
+function IsPrimeNumber(const z: RComplex): boolean;
+
 function AreEqComplex(const z1,z2: RComplex): boolean;
 function IsEqWithInt(const z: RComplex; n: longint): boolean;
 function IsRationalLE(const z1,z2 : RComplex): boolean;
@@ -54,7 +61,7 @@ function IsRationalGT(const z1,z2 : RComplex): boolean;
 
 function IntToComplex(x: integer): RComplex;
 function ComplexAdd (const z1,z2: RComplex): RComplex;
-function ComplexDiff(const z1,z2: RComplex): RComplex;
+function ComplexSub(const z1,z2: RComplex): RComplex;
 function ComplexNeg (const z: RComplex): RComplex;
 function ComplexMult(const z1,z2: RComplex): RComplex;
 function ComplexInv(const z: RComplex): RComplex;
@@ -64,7 +71,6 @@ function ComplexNorm(const z: RComplex): Rational;
 function CompareInt(X1,X2: Longint): Integer;
 function CompareIntStr(X1,X2: String): Integer;
 function CompareComplex(const z1,z2: RComplex): Integer;
-
 
 implementation
 
@@ -415,6 +421,22 @@ label ex;var a1,b1,p,r:string;
    {$ENDIF}
 end;
 
+function LCM(a,b:string):string;
+var a1,b1,r:string;
+ begin
+   a1:=a; b1:=b;
+   {$IFDEF DEBUGNUM}
+    writeln(infofile,'LCM(',a1,',',b1,')');
+   {$ENDIF}
+    checkzero(a1,b1);
+    a1:=abs(a1);b1:=abs(b1);
+    r:=Diva(Mul(a1,b1),GCD(a1,b1));
+    LCM:=r;
+   {$IFDEF DEBUGNUM}
+    writeln(infofile,'End LCM:',r);
+   {$ENDIF}
+end;
+
 function Add(a,b :string ):string;
 label ex; var r : string;
 begin
@@ -501,7 +523,36 @@ begin
    {$ENDIF}
 end;
 
-procedure RationalGCD(var r: Rational);
+function IsPrime(a: string): boolean;
+var i: string;
+r: boolean;
+begin
+    if leq('2',a) then 
+	begin
+	    r:=true;
+	    i:='2';
+	    while leq(Mul(i,i),a) do
+	    begin
+		if GCD(a,i)=i then
+		begin
+		    r:=false;
+		    break;
+		end;
+		i:=Add(i,'1');
+	    end;
+	end
+    else r:=false;
+    IsPrime:=r;
+end;
+
+function Divides(a,b: string): boolean;
+var r: boolean;
+begin
+    r:=GCD(a,b)=abs(a);
+    Divides:=r;
+end;
+
+procedure RationalReduce(var r: Rational);
  var lGcd:string;
 begin
  lGcd := gcd(r.Num,r.Den);
@@ -514,17 +565,17 @@ var lRes: Rational;
 begin
  lRes.Num := Add(Mul(r1.Num,r2.Den),Mul(r1.Den,r2.Num));
  lRes.Den := Mul(r1.Den,r2.Den);
- RationalGCD(lRes);
+ RationalReduce(lRes);
  RationalAdd:=lRes;
 end;
 
-function RationalDiff(const r1,r2: Rational): Rational;
+function RationalSub(const r1,r2: Rational): Rational;
 var lRes: Rational;
 begin
  lRes.Num := Sub(Mul(r1.Num,r2.Den),Mul(r1.Den,r2.Num));
  lRes.Den := Mul(r1.Den,r2.Den);
- RationalGCD(lRes);
- RationalDiff:= lRes;
+ RationalReduce(lRes);
+ RationalSub:= lRes;
 end;
 
 function RationalNeg(const r1: Rational): Rational;
@@ -540,7 +591,7 @@ var lRes: Rational;
 begin
  lRes.Num := Mul(r1.Num,r2.Num);
  lRes.Den := Mul(r1.Den,r2.Den);
- RationalGCD(lRes);
+ RationalReduce(lRes);
  RationalMult:= lRes;
 end;
 
@@ -575,12 +626,23 @@ end;
 
 function RationalGT(const r1,r2: Rational): boolean;
 begin
- RationalGT := le(Mul(r1.Num,r2.Den),Mul(r1.Den,r2.Num));
+ RationalGT := not RationalLE(r1,r2);
+end;
+
+function IsIntegerNumber(const z: RComplex): boolean;
+begin
+ IsIntegerNumber := (z.Im.Num = '0') and (z.Re.Den = '1');
 end;
 
 function IsNaturalNumber(const z: RComplex): boolean;
 begin
  IsNaturalNumber := (z.Im.Num = '0') and (z.Re.Den = '1') and (geq(z.Re.Num,'0'));
+end;
+
+function IsPrimeNumber(const z: RComplex): boolean;
+begin
+    if IsNaturalNumber(z) and IsPrime(z.Re.Num) then IsPrimeNumber := true
+    else IsPrimeNumber := false;
 end;
 
 function AreEqComplex(const z1,z2: RComplex): boolean;
@@ -624,15 +686,15 @@ begin
  ComplexAdd:= lRes;
 end;
 
-function ComplexDiff(const z1,z2: RComplex): RComplex;
+function ComplexSub(const z1,z2: RComplex): RComplex;
 var lRes:RComplex;
 begin
- lRes.Re := RationalDiff(z1.Re,z2.Re);
- lRes.Im := RationalDiff(z1.Im,z2.Im);
+ lRes.Re := RationalSub(z1.Re,z2.Re);
+ lRes.Im := RationalSub(z1.Im,z2.Im);
 {$IFDEF CH_REPORT}
    CHReport.Out_NumReq3(rqRealDiff, z1, z2, lRes);
 {$ENDIF}  
- ComplexDiff:= lRes;
+ ComplexSub:= lRes;
 end;
 
 function ComplexNeg(const z: RComplex): RComplex;
@@ -652,7 +714,7 @@ begin
  if IsEqWithInt(z1, -1) then ComplexMult:= ComplexNeg(z2) else
   if IsEqWithInt(z2, -1) then ComplexMult:= ComplexNeg(z1) else
  begin
- lRes.Re := RationalDiff(RationalMult(z1.Re,z2.Re),RationalMult(z1.Im,z2.Im));
+ lRes.Re := RationalSub(RationalMult(z1.Re,z2.Re),RationalMult(z1.Im,z2.Im));
  lRes.Im := RationalAdd(RationalMult(z1.Re,z2.Im),RationalMult(z1.Im,z2.Re));
  ComplexMult:=lRes;
 {$IFDEF CH_REPORT}
@@ -665,6 +727,7 @@ function ComplexDiv(const z1,z2: RComplex) : RComplex;
  var lDenom : Rational;
  lRes:RComplex;
 begin
+ lRes:=CZero;
  with z2 do
   lDenom := RationalAdd(RationalMult(Re,Re),RationalMult(Im,Im));
  if lDenom.Num = '0' then
@@ -678,7 +741,7 @@ begin
    lRes.Re := RationalDiv(RationalAdd(RationalMult(z1.Re,z2.Re),
                                         RationalMult(z1.Im,z2.Im)),
                             lDenom);
-   lRes.Im := RationalDiv(RationalDiff(RationalMult(z1.Im,z2.Re),
+   lRes.Im := RationalDiv(RationalSub(RationalMult(z1.Im,z2.Re),
                                          RationalMult(z1.Re,z2.Im)),
                             lDenom);
 {$IFDEF CH_REPORT}
@@ -723,6 +786,5 @@ begin
   if lInt <> 0 then begin CompareComplex:=lInt; exit end;
   CompareComplex:=CompareIntStr(z1.Im.Den,z2.Im.Den);
 end;
-
 
 end.
