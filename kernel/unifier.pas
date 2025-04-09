@@ -1510,7 +1510,7 @@ nie zachodzila nierownosc. To jest wariant negatywny.
             begin lInstColl1.InitBottom;
              for i:=1 to EqClassNbr do
               if EqClassVal[i].Determined then
-               if IsRationalGT(EqClassVal[i].NumericValue,EqClassVal[k].NumericValue) then
+               if IsRationalGT(EqClassVal[k].NumericValue,EqClassVal[i].NumericValue) then
                 begin
 {$IFDEF CH_REPORT}
                  CHReport.Out_NegNumReq2(
@@ -1549,6 +1549,33 @@ nie zachodzila nierownosc. To jest wariant negatywny.
                  lInstColl1.UnionWith(@lInstColl2);
                 end;
               end;
+             lInstColl.JoinWith(@lInstColl1);
+             UnionWith(@lInstColl);
+            end;
+          end;
+      end
+     else if lPred = gBuiltIn[rqDivides] then
+      begin
+       GetBinArgs(fFrm,lLeft,lRight);
+       for k:=1 to EqClassNbr do
+        with EqClassVal[k] do
+         if Determined and IsIntegerNumber(NumericValue) then
+          begin
+           lInstColl.UNITrm(lLeft,addr(ETrm[K]));
+           if lInstColl.Count <> 0 then
+            begin lInstColl1.InitBottom;
+             for i:=1 to EqClassNbr do
+              if EqClassVal[i].Determined and IsIntegerNumber(EqClassVal[i].NumericValue) then
+               if not Divides(EqClassVal[k].NumericValue.Re.Num,EqClassVal[i].NumericValue.Re.Num) then
+                begin
+{$IFDEF CH_REPORT}
+                 CHReport.Out_NegNumReq2(
+                  rqDivides,EqClassVal[k].NumericValue,
+                  EqClassVal[i].NumericValue);
+{$ENDIF}
+                 lInstColl2.UNITrm(lRight,addr(ETrm[i]));
+                 lInstColl1.UnionWith(@lInstColl2);
+                end;
              lInstColl.JoinWith(@lInstColl1);
              UnionWith(@lInstColl);
             end;
@@ -1817,6 +1844,37 @@ begin
                  lInstColl1.UnionWith(@lInstColl2);
                 end;
              end;
+            lInstColl.JoinWith(@lInstColl1);
+            UnionWith(@lInstColl);
+           end;
+         end;
+      end
+     else if lPred = gBuiltIn[rqDivides] then
+      begin
+       GetBinArgs(fFrm,lLeft,lRight);
+       for K := 0 to PosBas.Count-1 do
+        begin
+         lInstColl.UNIFrm(FFrm,PosBas.Items^[K]);
+         UnionWith(@lInstColl);
+        end;
+       for k:=1 to EqClassNbr do
+        with EqClassVal[k] do
+        if Determined and IsIntegerNumber(NumericValue) then
+         begin
+          lInstColl.UNITrm(lLeft,addr(ETrm[K]));
+          if lInstColl.Count <> 0 then
+           begin lInstColl1.InitBottom;
+            for i:=1 to EqClassNbr do
+             if EqClassVal[i].Determined and IsIntegerNumber(EqClassVal[i].NumericValue) then
+             if Divides(EqClassVal[k].NumericValue.Re.Num,EqClassVal[i].NumericValue.Re.Num) then
+               begin
+{$IFDEF CH_REPORT}
+                CHReport.Out_NumReq2(rqDivides,EqClassVal[k].NumericValue,
+                           EqClassVal[i].NumericValue);
+{$ENDIF}
+                lInstColl2.UNITrm(lRight,addr(ETrm[i]));
+                lInstColl1.UnionWith(@lInstColl2);
+               end;
             lInstColl.JoinWith(@lInstColl1);
             UnionWith(@lInstColl);
            end;
