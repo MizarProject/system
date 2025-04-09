@@ -10,10 +10,10 @@ interface
 
 const 
    PCMizarReleaseNbr = 8;
-   PCMizarVersionNbr = 1;
-   PCMizarVariantNbr = 12;
+   PCMizarVersionNbr = 2;
+   PCMizarVariantNbr = 1;
 
-   CurrentYear = 2022;
+   CurrentYear = 2025;
 
 {$IFDEF WIN32}
    DirSeparator = '\';
@@ -83,10 +83,3 @@ begin
 end;
 
 end.
-
-
-
-
-
-
-
