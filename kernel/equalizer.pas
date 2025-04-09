@@ -1235,6 +1235,14 @@ begin fVal.Determined:=false;
   end;
 end;
 
+procedure RatSub(fVal1,fVal2:ValRec; var fVal:ValRec);
+begin fVal.Determined:=false;
+ if fVal1.Determined and fVal2.Determined then
+  begin fVal.Determined:=true;
+   fVal.NumericValue:=ComplexSub(fVal1.NumericValue,fVal2.NumericValue);
+  end;
+end;
+
 procedure RatSucc(fVal1:ValRec; var fVal:ValRec);
 begin
  fVal.Determined:=false;
@@ -1264,6 +1272,66 @@ begin fVal.Determined:=false;
   begin fVal.Determined:=true;
    fVal.NumericValue:=ComplexInv(fVal1.NumericValue);
   end;
+end;
+
+procedure IntDiv(fVal1,fVal2:ValRec; var fVal:ValRec);
+var d: String;
+begin
+ fVal.Determined:=false;
+ if fVal1.Determined and IsIntegerNumber(fVal1.NumericValue) and
+    fVal2.Determined and IsIntegerNumber(fVal2.NumericValue) then
+      begin
+       fVal:=One;
+       if IsEqWithInt(fVal2.NumericValue,0) then fVal.NumericValue.Re.Num:='0'
+       else 
+        if CompareIntStr(Mul(fVal1.NumericValue.Re.Num,fVal2.NumericValue.Re.Num),'0')>=0 then
+         fVal.NumericValue.Re.Num:=Diva(fVal1.NumericValue.Re.Num,fVal2.NumericValue.Re.Num)
+        else
+         begin
+          d:=Diva(fVal1.NumericValue.Re.Num,fVal2.NumericValue.Re.Num);
+          if fVal1.NumericValue.Re.Num=Mul(d,fVal2.NumericValue.Re.Num) then fVal.NumericValue.Re.Num := d
+          else fVal.NumericValue.Re.Num:=Sub(d,'1');
+         end;
+      end;
+end;
+
+procedure IntMod(fVal1,fVal2:ValRec; var fVal:ValRec);
+begin
+ fVal.Determined:=false;
+ if fVal1.Determined and IsIntegerNumber(fVal1.NumericValue) and
+    fVal2.Determined and IsIntegerNumber(fVal2.NumericValue) then
+      begin
+       fVal:=One;
+       if IsEqWithInt(fVal2.NumericValue,0) then fVal.NumericValue.Re.Num:='0'
+       else 
+        begin
+         IntDiv(fVal1,fVal2,fVal);
+         RatMult(fVal,fVal2,fVal);
+         RatSub(fVal1,fVal,fVal);
+        end;
+      end;
+end;
+
+procedure IntGCD(fVal1,fVal2:ValRec; var fVal:ValRec);
+begin
+ fVal.Determined:=false;
+ if fVal1.Determined and IsIntegerNumber(fVal1.NumericValue) and
+    fVal2.Determined and IsIntegerNumber(fVal2.NumericValue) then
+      begin
+       fVal:=One;
+       fVal.NumericValue.Re.Num:=GCD(fVal1.NumericValue.Re.Num,fVal2.NumericValue.Re.Num);
+      end;
+end;
+
+procedure IntLCM(fVal1,fVal2:ValRec; var fVal:ValRec);
+begin
+ fVal.Determined:=false;
+ if fVal1.Determined and IsIntegerNumber(fVal1.NumericValue) and
+    fVal2.Determined and IsIntegerNumber(fVal2.NumericValue) then
+      begin
+       fVal:=One;
+       fVal.NumericValue.Re.Num:=LCM(fVal1.NumericValue.Re.Num,fVal2.NumericValue.Re.Num);
+      end;
 end;
 
 procedure AddEquality(var aEquals: IntRel; LArg,RArg: integer);
@@ -3302,6 +3370,90 @@ Next:
              end;
            end;
         end;
+     { --- NUMREQ??? --- }
+       rqDiv:
+        begin
+         for ii:=0 to fTerms.Count-1 do
+          with FuncTrmPtr(fTerms.Items^[ii])^ do
+          begin
+           lt1:=FuncArgs^.XTrmPtr; lt2:=FuncArgs^.NextTrm^.XTrmPtr;
+           lTrmInfo:=TrmS[TrmInfo].Term^.TrmInfo;
+           if Trms[lt2^.TrmInfo].NumValue.Determined then
+             if IsEqWithInt(Trms[lt1^.TrmInfo].NumValue.NumericValue,1) then
+               UnionTrms(lTrmInfo,lt1^.TrmInfo);
+           IntDiv(Trms[lt1^.TrmInfo].NumValue,Trms[lt2^.TrmInfo].NumValue,lVal);
+           if lVal.Determined then
+           begin
+{$IFDEF CH_REPORT}
+              CHReport.Out_NumReq2(rqDiv,
+                                   Trms[lt1^.TrmInfo].NumValue.NumericValue,
+                                   Trms[lt2^.TrmInfo].NumValue.NumericValue);
+{$ENDIF}
+            EquateComplexValue(lTrmInfo,lVal);
+            if Contr > 0 then exit
+           end;
+          end;
+        end;
+       rqMod:
+        begin
+         for ii:=0 to fTerms.Count-1 do
+          with FuncTrmPtr(fTerms.Items^[ii])^ do
+          begin
+           lt1:=FuncArgs^.XTrmPtr; lt2:=FuncArgs^.NextTrm^.XTrmPtr;
+           lTrmInfo:=TrmS[TrmInfo].Term^.TrmInfo;
+           IntMod(Trms[lt1^.TrmInfo].NumValue,Trms[lt2^.TrmInfo].NumValue,lVal);
+           if lVal.Determined then
+           begin
+{$IFDEF CH_REPORT}
+              CHReport.Out_NumReq2(rqMod,
+                                   Trms[lt1^.TrmInfo].NumValue.NumericValue,
+                                   Trms[lt2^.TrmInfo].NumValue.NumericValue);
+{$ENDIF}
+            EquateComplexValue(lTrmInfo,lVal);
+            if Contr > 0 then exit
+           end;
+          end;
+        end;
+       rqLCM:
+        begin
+         for ii:=0 to fTerms.Count-1 do
+          with FuncTrmPtr(fTerms.Items^[ii])^ do
+          begin
+           lt1:=FuncArgs^.XTrmPtr; lt2:=FuncArgs^.NextTrm^.XTrmPtr;
+           lTrmInfo:=TrmS[TrmInfo].Term^.TrmInfo;
+           IntLCM(Trms[lt1^.TrmInfo].NumValue,Trms[lt2^.TrmInfo].NumValue,lVal);
+           if lVal.Determined then
+           begin
+{$IFDEF CH_REPORT}
+              CHReport.Out_NumReq2(rqLCM,
+                                   Trms[lt1^.TrmInfo].NumValue.NumericValue,
+                                   Trms[lt2^.TrmInfo].NumValue.NumericValue);
+{$ENDIF}
+            EquateComplexValue(lTrmInfo,lVal);
+            if Contr > 0 then exit
+           end;
+          end;
+        end;
+       rqGCD:
+        begin
+         for ii:=0 to fTerms.Count-1 do
+          with FuncTrmPtr(fTerms.Items^[ii])^ do
+          begin
+           lt1:=FuncArgs^.XTrmPtr; lt2:=FuncArgs^.NextTrm^.XTrmPtr;
+           lTrmInfo:=TrmS[TrmInfo].Term^.TrmInfo;
+           IntGCD(Trms[lt1^.TrmInfo].NumValue,Trms[lt2^.TrmInfo].NumValue,lVal);
+           if lVal.Determined then
+           begin
+{$IFDEF CH_REPORT}
+              CHReport.Out_NumReq2(rqGCD,
+                                   Trms[lt1^.TrmInfo].NumValue.NumericValue,
+                                   Trms[lt2^.TrmInfo].NumValue.NumericValue);
+{$ENDIF}
+            EquateComplexValue(lTrmInfo,lVal);
+            if Contr > 0 then exit
+           end;
+          end;
+        end;
       end;
      end;
 
@@ -3804,7 +3956,7 @@ procedure Equate(var fEval:NatFunc);
       CollectedE: NatSet;
       lTl,llTL1,LTL1,LTL2,sTrmList,selTrmList:TrmList;
       llInsTyp: TypPtr;
-      lAttr,lPositive,lNegative,lZero,rPositive,rNegative,rZero: AttrPtr;
+      lAttr,lPositive,lNegative,lZero,rPositive,rNegative,rZero,lPrime: AttrPtr;
       lTrmInfo,lPredNr: integer;
       lEqList: integer;
       lFrm1: FrmPtr;
@@ -3821,8 +3973,8 @@ procedure Equate(var fEval:NatFunc);
    label 111,63,EndEquate;
 begin { Equate }
 {$IFDEF MDEBUG}
-//writeln(infofile,'InferConstDef.Count=',InferConstDef.Count);
-//for II:=0 to InferConstDef.Count-1 do InfoInferConstDef(II);
+writeln(infofile,'InferConstDef.Count=',InferConstDef.Count);
+for II:=0 to InferConstDef.Count-1 do InfoInferConstDef(II);
 {$ENDIF}
    EqClassNbr:=0;
 
@@ -3940,7 +4092,7 @@ begin { Equate }
 }
        PosBas.Insert(lFrm);
        {$IFDEF MDEBUG}
-//       InfoString('PosBas: '); InfoFormula(lFrm); InfoNewLine;
+       InfoString('PosBas: '); InfoFormula(lFrm); InfoNewLine;
        {$ENDIF}
       end;
     end;
@@ -3971,7 +4123,7 @@ begin { Equate }
         YFormula(lFrm);
         NegBas.Insert(lFrm);
         {$IFDEF MDEBUG}
-//        InfoString('NegBas: '); InfoFormula(lFrm); InfoNewLine;
+        InfoString('NegBas: '); InfoFormula(lFrm); InfoNewLine;
         {$ENDIF}
        end;
    if Contr > 0 then
@@ -4260,8 +4412,8 @@ begin { Equate }
            end;
            if Trms[lRightArg^.TrmInfo].NumValue.Determined and
              Trms[lLeftArg^.TrmInfo].NumValue.Determined and
-              IsRationalGT(Trms[lRightArg^.TrmInfo].NumValue.NumericValue,
-                           Trms[lLeftArg^.TrmInfo].NumValue.NumericValue) then
+              IsRationalGT(Trms[lLeftArg^.TrmInfo].NumValue.NumericValue,
+                           Trms[lRightArg^.TrmInfo].NumValue.NumericValue) then
            begin
 {$IFDEF CH_REPORT}
             CHReport.Out_NegNumReq2(rqLessOrEqual,
@@ -4300,7 +4452,26 @@ begin { Equate }
           lInsTyp:=NewStandardTyp(ikTypMode,NewEmptyCluster,NewEmptyCluster,
                                   gBuiltIn[rqElement],NewTrmList(lRightArg,nil));
           InsertType(lInsTyp,lLeftArg^.TrmInfo);
-         end;
+         end
+        else if lPred = gBuiltIn[rqDivides] then
+         begin
+          lLeftArg:=lArgs^.XTrmPtr; lRightArg:=lArgs^.NextTrm^.XTrmPtr;
+           if Trms[lRightArg^.TrmInfo].NumValue.Determined and
+             Trms[lLeftArg^.TrmInfo].NumValue.Determined and
+             IsIntegerNumber(Trms[lLeftArg^.TrmInfo].NumValue.NumericValue) and
+             IsIntegerNumber(Trms[lRightArg^.TrmInfo].NumValue.NumericValue) and
+              not Divides(Trms[lLeftArg^.TrmInfo].NumValue.NumericValue.Re.Num,
+                           Trms[lRightArg^.TrmInfo].NumValue.NumericValue.Re.Num) then
+           begin
+{$IFDEF CH_REPORT}
+            CHReport.Out_NegNumReq2(rqDivides,
+                           Trms[lLeftArg^.TrmInfo].NumValue.NumericValue,
+                           Trms[lRightArg^.TrmInfo].NumValue.NumericValue);
+{$ENDIF}
+             SetContr(320);
+             exit;
+           end;
+          end;
       end;
     end;
    end;
@@ -4481,7 +4652,27 @@ begin { Equate }
                end;
              end;
             dispose(lTyp,Done);
+           end
+         else if (lPred = gBuiltIn[rqDivides]) then
+           begin 
+            lLeftArg:=lArgs^.XTrmPtr; 
+            lRightArg:=lArgs^.NextTrm^.XTrmPtr;
+            if Trms[lRightArg^.TrmInfo].NumValue.Determined and
+             Trms[lLeftArg^.TrmInfo].NumValue.Determined and
+             IsIntegerNumber(Trms[lLeftArg^.TrmInfo].NumValue.NumericValue) and
+             IsIntegerNumber(Trms[lRightArg^.TrmInfo].NumValue.NumericValue) and
+              Divides(Trms[lLeftArg^.TrmInfo].NumValue.NumericValue.Re.Num,
+                           Trms[lRightArg^.TrmInfo].NumValue.NumericValue.Re.Num) then
+           begin
+{$IFDEF CH_REPORT}
+            CHReport.Out_NegNumReq2(rqDivides,
+                           Trms[lLeftArg^.TrmInfo].NumValue.NumericValue,
+                           Trms[lRightArg^.TrmInfo].NumValue.NumericValue);
+{$ENDIF}
+             SetContr(321);
+             exit;
            end;
+          end;
          for j:=0 to PosBas.Count-1 do
           if EqFrms(PosBas.Items^[j],NegBas.Items^[ii]) then
            begin
@@ -4597,6 +4788,32 @@ MiniProfiler.SectionEnd;
 //writeln(InfoFile,'TRMS ----');
 //infoeqclasses;
 {$ENDIF} ;
+
+if (gBuiltIn[rqPrime]<>0) then
+  for ANi:=1 to trmnbr do
+   begin
+    if (TrmS[ANi].EqClass<>nil) and (Trms[ANi].NumValue.Determined) then
+     begin
+      lPrime:=Trms[ANi].Supercluster^.GetAttr(gBuiltIn[rqPrime],nil);
+      if (lprime<>nil) and (lPrime^.fNeg=ord(false)) and IsPrimeNumber(Trms[ANi].NumValue.NumericValue) then
+	begin
+{$IFDEF CH_REPORT}
+            CHReport.Out_NumReq1(rqPrime,Trms[ANi].NumValue.NumericValue);
+{$ENDIF}
+             SetContr(500);
+             exit;
+        end;
+      if (lprime<>nil) and (lPrime^.fNeg=ord(true)) and not IsPrimeNumber(Trms[ANi].NumValue.NumericValue) then
+	begin
+{$IFDEF CH_REPORT}
+            CHReport.Out_NumReq1(rqPrime,Trms[ANi].NumValue.NumericValue);
+{$ENDIF}
+             SetContr(501);
+             exit;
+        end;
+     end;
+   end;
+
 
 EndEquate:
 
