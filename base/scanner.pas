@@ -259,8 +259,8 @@ end;
 procedure MTokeniser.SliceIt;
 var
   lCurrChar,EndOfPhrase, lIndex, EndOfSymbol, EndOfIdent, IdentLength,
-  lToken, lFailed, I,J: integer;
-  lNumber: Int64;
+  lToken, lFailed, I: integer;
+  lNumber,J: Int64;
   FoundToken, lIdent: TokenPtr;
   lSpelling: string;
   lPos:Position;
