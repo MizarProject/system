@@ -625,14 +625,14 @@ begin
 
    if fConj then
     begin 
-     lExpansion:=NewExpansion(lTyp,lLeftGuardFrm,lRightGuardFrm,NewNeg(lFrm1));
+     lExpansion:=NewExpansion(lTyp,lLeftGuardFrm^.CopyFormula,lRightGuardFrm^.CopyFormula,NewNeg(lFrm1));
      WithinFormula(lExpansion,IncBoundVar);
      WithinFormula(lExpansion,LociToBoundVar);
      lResult:=new(FlexFrmPtr,InitD(fFrm1,fFrm2,lExpansion,lLeftGuardTrm,lRightGuardTrm));
     end
    else
     begin 
-     lExpansion:=NewExpansion(lTyp,lLeftGuardFrm,lRightGuardFrm,lFrm1);
+     lExpansion:=NewExpansion(lTyp,lLeftGuardFrm^.CopyFormula,lRightGuardFrm^.CopyFormula,lFrm1);
      WithinFormula(lExpansion,IncBoundVar);
      WithinFormula(lExpansion,LociToBoundVar);
      lResult:=NewNeg(new(FlexFrmPtr,InitD(NewNeg(fFrm1),NewNeg(fFrm2),lExpansion,lLeftGuardTrm,lRightGuardTrm)));
