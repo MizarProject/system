@@ -1056,7 +1056,7 @@ begin if VarNr = 0 then begin Analyze:=NewInCorTrm; exit end;
      WithinTerm(lTrm,ChangeBound);
      Analyze:=lTrm; exit;
     end;
-   if FixedVar[VarNr].nTyp^.TypSort=ikError then
+   if (FixedVar[VarNr].nTyp = nil) or (FixedVar[VarNr].nTyp^.TypSort = ikError) then
     begin Analyze:=NewInCorTrm; exit end;
   end;
  ikTrmLocus:

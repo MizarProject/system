@@ -585,7 +585,7 @@ begin
    with ConjFrmPtr(fFrmPtr)^.Conjuncts do
     begin lFrmPtr:=NewVerum;
      for z:=0 to Count-1 do
-      lFrmPtr:=NewConj(lFrmPtr,DistributeQuantifiers(ConjFrmPtr(Items^[z])));
+      lFrmPtr:=NewConj(lFrmPtr,DistributeQuantifiers(FrmPtr(Items^[z])));
      DistributeQuantifiers:=lFrmPtr;
     end;
   ikFrmUniv:
