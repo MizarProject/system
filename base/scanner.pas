@@ -49,6 +49,9 @@ type
 
      fTokens,fIdents: TokensCollection;
 
+     fWords: array of MTokenPtr;   // of MTokenPtr - all words in article
+     fWordsNbr: integer;
+
     constructor Init;
     destructor Done; virtual;
 
@@ -62,6 +65,9 @@ type
     function IsIdentifierFirstLetter(ch: char): boolean; virtual;
 
     function Spelling(const aToken: LexemRec): string; virtual;
+
+    procedure PrintAllWords;
+
  end;
 
  MScannPtr = ^MScannObj;
@@ -246,6 +252,8 @@ begin
  fTokensBuf.Init(80,8);
  fTokens.Init(0);
  fIdents.Init(100);
+ setlength(fWords,100000);
+ fWordsNbr:=0;
 end;
 
 destructor MTokeniser.Done;
@@ -254,6 +262,7 @@ begin
  fTokensBuf.Done;
  fTokens.Done;
  fIdents.Done;
+ fWords:=nil;
 end;
 
 procedure MTokeniser.SliceIt;
@@ -428,6 +437,23 @@ begin
  fStr:=MTokenPtr(fTokensBuf.Items^[0])^.fStr;
  fPos:=MTokenPtr(fTokensBuf.Items^[0])^.fPos;
  fTokensBuf.AtFree(0);
+end;
+
+procedure MTokeniser.PrintAllWords;
+var i: integer;
+var lFile: XMLOutStreamObj;
+begin
+ lFile.OpenFile(EnvFileName+'.wrd');
+ lFile.Out_XElStart0( XMLElemName[elSymbols]);
+ for i:=0 to fWordsNbr-1 do
+  begin
+   lFile.Out_XElStart( XMLElemName[elSymbol]);
+   lFile.Out_XQuotedAttr( XMLAttrName[atSpelling], MTokenPtr(fWords[i])^.fStr);
+   lFile.Out_PosAsAttrs(MTokenPtr(fWords[i])^.fPos);
+   lFile.Out_XElEnd0;
+  end;
+ lFile.Out_XElEnd( XMLElemName[elSymbols]);
+ lFile.Done;
 end;
 
 function MTokeniser.IsIdentifierFirstLetter(ch: char): boolean;

@@ -641,8 +641,10 @@ uses mizenv;
 
 procedure ReadToken;
 begin
- PrevWord:=CurWord; PrevPos:=CurPos;
- CurWord:=AheadWord; CurPos:=AheadPos;
+ PrevWord:=CurWord;
+ PrevPos:=CurPos;
+ CurWord:=AheadWord;
+ CurPos:=AheadPos;
  {'_' is not allowed in an identifiers in the text proper}
  if (CurWord.Kind = sy_Begin)
   then gScanner^.Allowed['_']:=0;
@@ -654,13 +656,20 @@ begin
  AheadWord.Nr:=gScanner^.fLexem.Nr;
  AheadWord.Spelling:=gScanner^.fStr;
  AheadPos:=gScanner^.fPos;
+ gScanner^.fWords[gScanner.fWordsNbr]:=new(MTokenPtr,Init(gScanner^.fLexem.Kind,gScanner^.fLexem.Nr,gScanner^.fStr,gScanner^.fPos));
+ if length(gScanner^.fWords) = 1 + gScanner^.fWordsNbr then
+  begin
+   setlength(gScanner^.fWords, 2*length(gScanner^.fWords));
+  end;
+ inc(gScanner^.fWordsNbr);
 end;
 
 procedure LoadPrf(const aPrfFileName:string);
  var lPrf: text;
      lModeMaxArgsSize,lStructModeMaxArgsSize,lPredMaxArgsSize,i,lInt,r: integer;
 begin
- assign(lPrf,aPrfFileName+'.prf'); reset(lPrf);
+ assign(lPrf,aPrfFileName+'.prf');
+ reset(lPrf);
  Read(lPrf,lModeMaxArgsSize,lStructModeMaxArgsSize,lPredMaxArgsSize);
  ModeMaxArgs.Init(lModeMaxArgsSize+1);
  r:=ModeMaxArgs.Insert(0);
@@ -692,7 +701,8 @@ end;
 
 procedure StartScaner;
 begin
- CurPos.Line:=1; CurPos.Col:=0;
+ CurPos.Line:=1;
+ CurPos.Col:=0;
  AheadWord.Kind:=TokenKind(gScanner^.fLexem.Kind);
  AheadWord.Nr:=gScanner^.fLexem.Nr;
  AheadWord.Spelling:=gScanner^.fStr;
@@ -720,6 +730,7 @@ end;
 procedure FinishScanning;
 begin
  gScanner^.fIdents.SaveXDct(EnvFileName+'.idx');
+ gScanner^.PrintAllWords;
  CloseSourceFile;
  DisposePrf;
 end;
