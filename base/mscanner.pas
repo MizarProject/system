@@ -656,12 +656,6 @@ begin
  AheadWord.Nr:=gScanner^.fLexem.Nr;
  AheadWord.Spelling:=gScanner^.fStr;
  AheadPos:=gScanner^.fPos;
- gScanner^.fWords[gScanner.fWordsNbr]:=new(MTokenPtr,Init(gScanner^.fLexem.Kind,gScanner^.fLexem.Nr,gScanner^.fStr,gScanner^.fPos));
- if length(gScanner^.fWords) = 1 + gScanner^.fWordsNbr then
-  begin
-   setlength(gScanner^.fWords, 2*length(gScanner^.fWords));
-  end;
- inc(gScanner^.fWordsNbr);
 end;
 
 procedure LoadPrf(const aPrfFileName:string);
@@ -730,7 +724,6 @@ end;
 procedure FinishScanning;
 begin
  gScanner^.fIdents.SaveXDct(EnvFileName+'.idx');
- gScanner^.PrintAllWords;
  CloseSourceFile;
  DisposePrf;
 end;
