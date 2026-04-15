@@ -77,7 +77,7 @@ var
   gCorrCond: array[0..CorrCondNbr] of FrmPtr;
 {$IFDEF ANALYZER_REPORT}
   AReport:OutVRFFileObj;
-{$ENDIF}   
+{$ENDIF}
 
 procedure RenewPrimaries(fPrevLength:integer);
  var k:integer;
@@ -4847,7 +4847,7 @@ begin
   end;
 end;
 
-procedure ChangeLociInPropertySetHood(var fTrm: TrmPtr);
+procedure ChangeLociInPropertySethood(var fTrm: TrmPtr);
  var lTrm:TrmPtr;
 begin
  with VarTrmPtr(fTrm)^ do
@@ -5272,7 +5272,7 @@ exit;
      begin
       mizassert(2591,nOtherwise <> nil);
       lFrm:=FrmPtr(gDefiniens^.nOtherwise)^.CopyFormula;
-      WithinFormula(lFrm, ChangeLociInPropertySetHood);
+      WithinFormula(lFrm, ChangeLociInPropertySethood);
       lFrm:=NewExis(NewStandardTyp(ikTypMode,NewEmptyCluster,NewEmptyCluster,
                                    gBuiltIn[rqSetMode],nil),
                     NewUniv(ItTyp^.CopyType,
@@ -5283,7 +5283,8 @@ exit;
      end
     else
      begin mizassert(2592,nOtherwise <> nil);
-      lFrm:=nil; lOth:=NewVerum;
+      lFrm:=nil;
+      lOth:=NewVerum;
       with nPartialDefinientia do
        for z:=0 to Count-1 do
         with PartDefPtr(Items^[z])^ do
@@ -5301,7 +5302,7 @@ exit;
           llFrm:=NewConj(FrmPtr(nGuard)^.CopyFormula,llFrm);
           if lFrm = nil
            then lFrm:=llFrm
-           else lFrm:=NewDisj(lFrm,NewConj(FrmPtr(nGuard)^.CopyFormula,llFrm));
+           else lFrm:=NewDisj(lFrm,llFrm);
          end;
        llFrm:=FrmPtr(gDefiniens^.nOtherwise)^.CopyFormula;
        WithinFormula(llFrm,ChangeLociInProperty);
@@ -5315,7 +5316,7 @@ exit;
        lFrm:=NewDisj(lFrm,NewConj(lOth,llFrm));
       end;
     end;
-    SetHood:=lFrm;
+    Sethood:=lFrm;
   end;
 
 begin  {--- ProcessProperties ---}
@@ -5367,7 +5368,7 @@ begin  {--- ProcessProperties ---}
        9:  begin FuncProperty(9);  lPropCond:=Idempotence end;
        10: begin FuncProperty(10); lPropCond:=Involutiveness end;
        11: begin FuncProperty(11); lPropCond:=Projectivity end;
-       12: begin ModeProperty(12); lPropCond:=SetHood end;
+       12: begin ModeProperty(12); lPropCond:=Sethood end;
        else RunTimeError(2013);
       end;
      end;

@@ -30,6 +30,9 @@ procedure InfoComplex(const c: RComplex);
 procedure InfoInferConstDef(II: integer);
 procedure InfoBuildIn;
 
+procedure PrintInfoFormula(aFrm:FrmPtr; aComment:string; aNewLine:boolean);
+procedure PrintInfoTerm(aTrm:TrmPtr; aComment:string; aNewLine:boolean);
+
 implementation
 
 uses lexicon,limits,builtin,enums;
@@ -362,6 +365,18 @@ begin
   writeln(InfoFile,'omega : K', gBuiltIn[rqOmega]);            //32
   writeln(InfoFile,'0 : K', gBuiltIn[rqZeroNumber]);           //33
   writeln(InfoFile,'is zero : V', gBuiltIn[rqZero]);           //34
+end;
+
+procedure PrintInfoFormula(aFrm:FrmPtr; aComment:string; aNewLine:boolean);
+begin
+ if aNewLine then InfoNewLine;
+ InfoNewLine; InfoString(aComment+' = '); InfoFormula(aFrm); flush(InfoFile);
+end;
+
+procedure PrintInfoTerm(aTrm:TrmPtr; aComment:string; aNewLine:boolean);
+begin
+ if aNewLine then InfoNewLine;
+ InfoNewLine; InfoString(aComment+' = '); InfoTerm(aTrm); flush(InfoFile);
 end;
 
 end.
