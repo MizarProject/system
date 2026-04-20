@@ -1,0 +1,34 @@
+#!/bin/sh
+#   
+#          Mizar Abstractor, example shell command
+#
+
+accommodate()
+{
+ accom $1
+ if test "$?" = "0"
+  then
+   make_abstract $1
+  else
+   errflag $1
+   addfmsg $1 $MIZFILES/mizar
+   exit 2
+ fi
+}
+
+make_abstract()
+{
+ absedt $1
+ edtfile $1
+ mv $1.'$-$' $1.abs
+}
+
+if test -z "$1" 
+ then 
+  echo "> `basename $0` error : Missing parameter" 
+  echo "Usage: `basename $0` mizar_article_name" 
+  exit 1
+ else 
+  accommodate "`dirname $1`/`basename $1 .miz`"
+fi
+
