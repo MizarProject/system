@@ -721,9 +721,12 @@ begin
     'T':
       if TheoReferNbr.HasInDom(LibrNr,TheoNr) then
       begin
+       // Bound-variable types can differ between imported theorems.
+       MarkTermsInTTColl;
        lSnt:=lInEnvFile.In_Formula;
        CollectConstInFrm(lSnt);
        OrdTheorem.Insert(new(SntRefPtr,Init(LibrNr,TheoNr,lSnt)));
+       RemoveTermsFromTTColl;
       end
       else
       begin
@@ -733,9 +736,11 @@ begin
     'D':
      if DefReferNbr.HasInDom(LibrNr,TheoNr) then
      begin
+      MarkTermsInTTColl;
       lSnt:=lInEnvFile.In_Formula;
       CollectConstInFrm(lSnt);
       DefTheorem.Insert(new(SntRefPtr,Init(LibrNr,TheoNr,lSnt)));
+      RemoveTermsFromTTColl;
      end
      else
       begin
