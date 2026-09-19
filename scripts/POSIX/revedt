@@ -1,0 +1,34 @@
+#!/bin/sh
+#
+#          Mizar editing utilities, example shell command
+#
+
+accommodate()
+{
+ makeenv $1
+ if test "$?" = "0"
+  then
+   verify $1
+  else
+   errflag $1
+   addfmsg $1 $MIZFILES/mizar
+   exit 2
+ fi
+}
+
+verify()
+{
+ $VERIFIER $1
+ edtfile $1
+ cp $1.'$-$' $1.miz
+}
+
+if test -z "$1" -o -z "$2"
+ then 
+  echo "> `basename $0` error : Missing parameter" 
+  echo "Usage: `basename $0` mizar_utility_name mizar_article_name" 
+  exit 1
+ else 
+  VERIFIER=$1
+  accommodate "`dirname $2`/`basename $2 .miz`"
+fi
