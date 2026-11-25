@@ -186,9 +186,10 @@ end;
 function SchEqFrm(fFrm1,fFrm2:FrmPtr):boolean;
  var PredNr1,PredNr2,k,l,lValue: integer; A1,A2: TrmList;
      Left1,Right1,Left2,Right2: TrmPtr;
-     lFrm: FrmPtr;
+     lFrm,lOrigFrm1: FrmPtr;
      lNeg: boolean;
 begin SchEqFrm:=false;
+ lOrigFrm1:=fFrm1;
  lNeg:=false;
  if (fFrm1^.FrmSort = ikFrmNeg) and (fFrm2^.FrmSort <> ikFrmNeg) then
   begin lNeg:=true;
@@ -242,7 +243,7 @@ begin SchEqFrm:=false;
        end;
        lValue:=PredFrmPtr(fFrm2)^.PredNr;
        if lNeg then lValue:=-lValue;
-       gFPredSubst.Assign(Ord(fFrm2^.FrmSort),PredNr,PredFrmPtr(fFrm2)^.PredNr);
+       gFPredSubst.Assign(Ord(fFrm2^.FrmSort),PredNr,lValue);
        if SchEqTrmList(PredArgs,PredFrmPtr(fFrm2)^.PredArgs) then
          SchEqFrm:=true
        else gSchErrorNr:=23;
@@ -307,7 +308,20 @@ begin SchEqFrm:=false;
    else RunTimeError(2449);
   end
  else if fFrm2^.FrmSort = ikFrmPrivPred then
-  SchEqFrm:=SchEqFrm(fFrm1,LocPredFrmPtr(fFrm2)^.PredExp);
+  begin
+   if not lNeg then
+    SchEqFrm:=SchEqFrm(fFrm1,LocPredFrmPtr(fFrm2)^.PredExp)
+   else if lOrigFrm1^.FrmSort = ikFrmNeg then
+    SchEqFrm:=SchEqFrm(lOrigFrm1,LocPredFrmPtr(fFrm2)^.PredExp)
+   else
+    begin
+     lFrm:=LocPredFrmPtr(fFrm2)^.PredExp;
+     while lFrm^.FrmSort = ikFrmPrivPred do
+      lFrm:=LocPredFrmPtr(lFrm)^.PredExp;
+     if lFrm^.FrmSort = ikFrmNeg then
+      SchEqFrm:=SchEqFrm(lOrigFrm1,NegFrmPtr(lFrm)^.NegArg);
+    end;
+  end;
 end;
 
 function SchWidennings(aSource,fTarget: TypPtr): boolean;
